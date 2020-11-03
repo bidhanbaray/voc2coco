@@ -10,7 +10,7 @@ import re
 def get_label2id(labels_path: str) -> Dict[str, int]:
     """id is 1 start"""
     with open(labels_path, 'r') as f:
-        labels_str = f.read().split()
+        labels_str = f.read().split('\n')
     labels_ids = list(range(1, len(labels_str)+1))
     return dict(zip(labels_str, labels_ids))
 
@@ -94,11 +94,17 @@ def convert_xmls_to_cocojson(annotation_paths: List[str],
     print('Start converting !')
     for a_path in tqdm(annotation_paths):
         # Read annotation xml
-        ann_tree = ET.parse(a_path)
+        try:
+            ann_tree = ET.parse(a_path)
+        except:
+            continue
         ann_root = ann_tree.getroot()
 
-        img_info = get_image_info(annotation_root=ann_root,
+        try:
+            img_info = get_image_info(annotation_root=ann_root,
                                   extract_num_from_imgid=extract_num_from_imgid)
+        except:
+            continue
         img_id = img_info['id']
         output_json_dict['images'].append(img_info)
 
